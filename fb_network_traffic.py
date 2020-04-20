@@ -6,7 +6,7 @@ from matplotlib import pyplot as plt
 
 from variables import*
 from util import load_data
-from keras.layers import Dense, Input, GlobalMaxPooling1D, Conv1D, MaxPooling1D, LSTM, Dropout
+from keras.layers import Dense, Input, Dropout
 from keras.models import model_from_json
 from keras.models import Model
 

@@ -16,7 +16,7 @@ validation_split = 0.2
 
 #data paths and model weights
 big_csv = os.path.join(os.getcwd(), 'FGISY0.5s.csv')
-tl_path = os.path.join(os.getcwd(), 'M0.5s.csv')
+tl_path = os.path.join(os.getcwd(), 'M0.5s.csv') # tl - transfer_learning
 model_path =  os.path.join(os.getcwd(), 'base_model.json')
 model_weights =  os.path.join(os.getcwd(), 'base_model.h5')
 tl_model_path =  os.path.join(os.getcwd(), 'massenger.json')
