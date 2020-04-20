@@ -22,38 +22,20 @@ class NetworkTrafficClassifier(object):
         self.Ytest = Ytest
 
     def classifier(self):
-        inputs = Input(shape=(frame_count_threshold, n_features), name='inputs')
-        x = Conv1D(output_dim, kernal_size, activation='tanh')(inputs)
-        x = MaxPooling1D(pool_size)(x)
-        x = Conv1D(output_dim, kernal_size, activation='tanh')(x)
-        # x = MaxPooling1D(pool_size)(x)
-        # x = Conv1D(output_dim, kernal_size, activation='tanh')(x)
-        x = GlobalMaxPooling1D()(x)
+        inputs = Input(shape=(n_features,), name='inputs')
+        x = Dense(512, activation='tanh')(inputs)
         x = Dense(512, activation='tanh')(x)
+        x = Dense(128, activation='tanh')(x)
+        x = Dense(128, activation='tanh')(x)
         x = Dropout(0.3)(x)
         outputs = Dense(num_classes, activation='softmax')(x)
         self.model = Model(inputs, outputs)
-
-    # def classifier(self):
-    #     inputs = Input(shape=(frame_count_threshold, n_features), name='inputs')
-    #     x = LSTM(lstm1, return_sequences=True)(inputs)
-    #     x = Dropout(0.2)(x)
-    #     x = LSTM(lstm2, return_sequences=True)(x)
-    #     x = Dropout(0.2)(x)
-    #     x = LSTM(lstm3)(x)
-    #     x = Dropout(0.2)(x)
-    #     x = Dense(dense1)(x)
-    #     x = Dense(dense2)(x)
-    #     x = Dense(dense3)(x)
-    #     outputs = Dense(num_classes, activation='softmax')(x)
-    #     self.model = Model(inputs, outputs)
-
 
     def train(self):
         self.classifier()
         self.model.compile(
             loss='sparse_categorical_crossentropy',
-            optimizer='rmsprop',
+            optimizer='adam',
             metrics=['accuracy']
         )
 
@@ -72,7 +54,7 @@ class NetworkTrafficClassifier(object):
         json_file.close()
         loaded_model = model_from_json(loaded_model_json)
         loaded_model.load_weights(model_weights)
-        loaded_model.compile(loss='sparse_categorical_crossentropy', optimizer='rmsprop', metrics=['accuracy'])
+        loaded_model.compile(loss='sparse_categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
         self.model = loaded_model
 
     def save_model(self):
@@ -81,7 +63,16 @@ class NetworkTrafficClassifier(object):
             json_file.write(model_json)
         self.model.save_weights(model_weights)
 
+    def transfer_learning(self):
+        self.load_model()
+        for i in self.model.layers:
+            print(i)
+
 
 if __name__ == "__main__":
     model = NetworkTrafficClassifier()
-    model.train()
+    if os.path.exists(model_path) and os.path.exists(model_weights):
+        # model.load_model()
+        model.transfer_learning()
+    else:
+        model.train()
