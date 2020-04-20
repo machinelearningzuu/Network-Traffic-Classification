@@ -6,7 +6,7 @@ from matplotlib import pyplot as plt
 
 from variables import*
 from util import load_data
-from keras.layers import Dense, Input, GlobalMaxPooling1D, Conv1D, MaxPooling1D, LSTM
+from keras.layers import Dense, Input, GlobalMaxPooling1D, Conv1D, MaxPooling1D, LSTM, Dropout
 from keras.models import model_from_json
 from keras.models import Model
 
@@ -21,27 +21,32 @@ class NetworkTrafficClassifier(object):
         self.Xtest = Xtest
         self.Ytest = Ytest
 
-    # def classifier(self):
-    #     inputs = Input(shape=(frame_count_threshold, n_features), name='inputs')
-    #     x = Conv1D(output_dim, kernal_size, activation='relu')(inputs)
-    #     x = MaxPooling1D(pool_size)(x)
-    #     x = Conv1D(output_dim, kernal_size, activation='relu')(x)
-    #     x = MaxPooling1D(pool_size)(x)
-    #     x = Conv1D(output_dim, kernal_size, activation='relu')(x)
-    #     x = GlobalMaxPooling1D()(x)
-    #     x = Dense(output_dim, activation='relu')(x)
-    #     outputs = Dense(num_classes, activation='softmax')(x)
-    #     self.model = Model(inputs, outputs)
-
     def classifier(self):
         inputs = Input(shape=(frame_count_threshold, n_features), name='inputs')
-        x = LSTM(hidden_dim,return_sequences=True)(inputs)
-        x = LSTM(hidden_dim)(x)
-        x = Dense(dense1)(x)
-        x = Dense(dense2)(x)
-        x = Dense(dense3)(x)
+        x = Conv1D(output_dim, kernal_size, activation='tanh')(inputs)
+        x = MaxPooling1D(pool_size)(x)
+        x = Conv1D(output_dim, kernal_size, activation='tanh')(x)
+        # x = MaxPooling1D(pool_size)(x)
+        # x = Conv1D(output_dim, kernal_size, activation='tanh')(x)
+        x = GlobalMaxPooling1D()(x)
+        x = Dense(512, activation='tanh')(x)
+        x = Dropout(0.3)(x)
         outputs = Dense(num_classes, activation='softmax')(x)
         self.model = Model(inputs, outputs)
+
+    # def classifier(self):
+    #     inputs = Input(shape=(frame_count_threshold, n_features), name='inputs')
+    #     x = LSTM(lstm1, return_sequences=True)(inputs)
+    #     x = Dropout(0.2)(x)
+    #     x = LSTM(lstm2, return_sequences=True)(x)
+    #     x = Dropout(0.2)(x)
+    #     x = LSTM(lstm3)(x)
+    #     x = Dropout(0.2)(x)
+    #     x = Dense(dense1)(x)
+    #     x = Dense(dense2)(x)
+    #     x = Dense(dense3)(x)
+    #     outputs = Dense(num_classes, activation='softmax')(x)
+    #     self.model = Model(inputs, outputs)
 
 
     def train(self):

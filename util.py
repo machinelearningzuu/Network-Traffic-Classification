@@ -45,19 +45,32 @@ def pad_data(Input):
         if len(x) >= frame_count_threshold:
             new_x = x[:frame_count_threshold,]
         else:
-            new_x = np.zeros((frame_count_threshold, n_features)) # use pre padding
+            new_x = np.zeros((frame_count_threshold, n_features))
             len_x = len(x)
-            new_x[:len_x, ] = x
+            new_x[-len_x:, ] = x
         Pad_inputs[idx,:,:] = new_x
     return Pad_inputs
+
+def normalize_data(x):
+    x_min1 = x[:,:,0].min()
+    x_max1 = x[:,:,0].max()
+    x[:,:,0] = (x[:,:,0] - x_min1)/(x_max1 - x_min1)
+
+    x_min2 = x[:,:,1].min()
+    x_max2 = x[:,:,1].max()
+    x[:,:,1] = (x[:,:,1] - x_min2)/(x_max2 - x_min2)
+
+    return x
 
 def load_data():
     Pad_inputs,Outputs = get_data()
     Pad_inputs,Outputs = shuffle(Pad_inputs,Outputs)
+    Pad_inputs = normalize_data(Pad_inputs)
     Xtrain, Xtest, Ytrain, Ytest = train_test_split(
                                                     Pad_inputs,
                                                     Outputs,
                                                     test_size=validation_split,
                                                     random_state=seed
                                                     )
+
     return Xtrain, Xtest, Ytrain, Ytest
