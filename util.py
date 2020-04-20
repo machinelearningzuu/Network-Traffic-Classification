@@ -9,8 +9,12 @@ from sklearn.model_selection import train_test_split
 from variables import*
 
 def get_data():
-    df = pd.read_csv(big_csv)
+    csv_path = big_csv if base_model else tl_path
+    df = pd.read_csv(csv_path)
     class_names = df['activity'].values
+    num_classes = len(set(class_names))
+    print("Dataset has {} Classes".format(num_classes))
+
     encoder = LabelEncoder()
     encoder.fit(class_names)
     labels = encoder.transform(class_names)
@@ -20,11 +24,11 @@ def get_data():
     scaler.fit(Inputs)
     Inputs = scaler.transform(Inputs)
 
-    return Inputs, labels
+    return num_classes, Inputs, labels
 
 
 def load_data():
-    Inputs, labels = get_data()
+    num_classes, Inputs, labels = get_data()
     Inputs, labels = shuffle(Inputs, labels)
     Xtrain, Xtest, Ytrain, Ytest = train_test_split(
                                                     Inputs,
@@ -33,4 +37,4 @@ def load_data():
                                                     random_state=seed
                                                     )
 
-    return Xtrain, Xtest, Ytrain, Ytest
+    return num_classes, Xtrain, Xtest, Ytrain, Ytest
