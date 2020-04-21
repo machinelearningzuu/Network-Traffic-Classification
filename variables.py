@@ -16,6 +16,7 @@ validation_split = 0.2
 
 #data paths and model weights
 # tl - transfer_learning
+confustion_img = os.path.join(os.getcwd(), 'DataFiles/Confusion Matrix.png')
 base_csv = os.path.join(os.getcwd(), 'DataFiles/FGISY0.5s.csv')
 tl_path = os.path.join(os.getcwd(), 'DataFiles/M0.5s.csv')
 base_model_path =  os.path.join(os.getcwd(), 'DataFiles/base_model.json')

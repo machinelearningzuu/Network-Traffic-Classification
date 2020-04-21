@@ -16,6 +16,12 @@ logging.getLogger('tensorflow').disabled = True
 from variables import*
 from util import load_data
 
+'''  Use following command to run the script
+
+                python -W ignore model.py
+
+'''
+
 class NetworkTrafficClassifier(object):
     def __init__(self):
         encoder, unique_classes, Xtrain, Xtest, Ytrain, Ytest = load_data()
@@ -108,7 +114,7 @@ class NetworkTrafficClassifier(object):
     def plot_confusion(self,Y, P):
         classes = self.encoder.transform(list(self.unique_classes))
         confusion_matrix = tf.math.confusion_matrix(labels=Y, predictions=P).numpy()
-        confusion_matrix = np.around(confusion_matrix.astype('float') / confusion_matrix.sum(axis=1)[:, np.newaxis], decimals=2)
+        # confusion_matrix = np.around(confusion_matrix.astype('float') / confusion_matrix.sum(axis=1)[:, np.newaxis], decimals=2)
         confusion_matrix_df = pd.DataFrame(
                                 confusion_matrix,
                                 index = classes,
@@ -119,7 +125,8 @@ class NetworkTrafficClassifier(object):
         plt.tight_layout()
         plt.ylabel('True classes')
         plt.xlabel('Predicted classes')
-        plt.show()
+        plt.savefig(confustion_img)
+        # plt.show()
 
 if __name__ == "__main__":
     model = NetworkTrafficClassifier()
@@ -140,4 +147,4 @@ if __name__ == "__main__":
         print("Training the base model !!!")
         model.train()
 
-    model.evaluation(Xtest[:100], Ytest[:100])
+    model.evaluation(Xtest[:10000], Ytest[:10000])
