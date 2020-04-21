@@ -1,11 +1,11 @@
+import numpy as np
+import pandas as pd
+from matplotlib import pyplot as plt
+import seaborn as sns
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+import tensorflow as tf
 from tensorflow import keras
-import numpy as np
-from matplotlib import pyplot as plt
-
-from variables import*
-from util import load_data
 from keras.layers import Dense, Input, Dropout
 from keras.models import model_from_json
 from keras.models import Model
@@ -13,14 +13,20 @@ from keras.models import Model
 import logging
 logging.getLogger('tensorflow').disabled = True
 
+from variables import*
+from util import load_data
+
 class NetworkTrafficClassifier(object):
     def __init__(self):
-        num_classes, Xtrain, Xtest, Ytrain, Ytest = load_data()
+        encoder, unique_classes, Xtrain, Xtest, Ytrain, Ytest = load_data()
         self.Xtrain = Xtrain
         self.Ytrain = Ytrain
         self.Xtest = Xtest
         self.Ytest = Ytest
-        self.num_classes = num_classes
+        self.encoder = encoder
+        self.unique_classes = unique_classes
+        self.num_classes = len(unique_classes)
+        print("Dataset has {} Classes".format(self.num_classes))
 
     def classifier(self):
         inputs = Input(shape=(n_features,), name='inputs')
@@ -47,9 +53,9 @@ class NetworkTrafficClassifier(object):
                             epochs=num_epoches,
                             validation_data = [self.Xtest, self.Ytest],
                             )
-        self.save_model(model_path,model_weights)
+        self.save_model(base_model_path,base_model_weights)
 
-    def load_model(self):
+    def load_model(self, model_path, model_weights):
         json_file = open(model_path, 'r')
         loaded_model_json = json_file.read()
         json_file.close()
@@ -65,7 +71,6 @@ class NetworkTrafficClassifier(object):
         self.model.save_weights(model_weights)
 
     def transfer_learning(self):
-        self.load_model()
         inputs = Input(shape=(n_features,), name='inputs')
         x = inputs
         for layer in self.model.layers[1:-1]:
@@ -90,16 +95,49 @@ class NetworkTrafficClassifier(object):
                             )
         self.save_model(tl_model_path,tl_model_weights)
 
+    def evaluation(self,X,Y):
+        loss, accuracy = self.model.evaluate(X, Y, batch_size=batch_size)
+        Ypred = self.model.predict(X)
+        P = np.argmax(Ypred, axis=1)
+        Pclasses = self.encoder.inverse_transform(P)
+        self.plot_confusion(Y, P)
+        print("Test Loss : ", loss)
+        print("Test Accuracy : ", accuracy)
+        print("Predicted Classes : \n", Pclasses)
+
+    def plot_confusion(self,Y, P):
+        classes = self.encoder.transform(list(self.unique_classes))
+        confusion_matrix = tf.math.confusion_matrix(labels=Y, predictions=P).numpy()
+        confusion_matrix = np.around(confusion_matrix.astype('float') / confusion_matrix.sum(axis=1)[:, np.newaxis], decimals=2)
+        confusion_matrix_df = pd.DataFrame(
+                                confusion_matrix,
+                                index = classes,
+                                columns = classes
+                                )
+        figure = plt.figure(figsize=(10, 10))
+        sns.heatmap(confusion_matrix_df, annot=True,cmap= plt.cm.Blues)
+        plt.tight_layout()
+        plt.ylabel('True classes')
+        plt.xlabel('Predicted classes')
+        plt.show()
 
 if __name__ == "__main__":
     model = NetworkTrafficClassifier()
-    if os.path.exists(model_path) and os.path.exists(model_weights):
-        if base_model:
-            print("Loaing the base model !")
-            model.load_model()
-        else:
-            print("Transfer Learning !")
-            model.transfer_learning()
+    _, _, Xtrain, Xtest, Ytrain, Ytest = load_data()
+    if os.path.exists(base_model_path) and os.path.exists(base_model_weights):
+        print("Loading the base model !!!")
+        model.load_model(base_model_path,base_model_weights)
+
+        if not base_model:
+            if os.path.exists(tl_model_path) and os.path.exists(tl_model_weights):
+                print("Loading Transfer learning model !!!")
+                model.load_model(tl_model_path,tl_model_weights)
+            else:
+                print("Transfer Learning on new data !!!")
+                model.transfer_learning()
+
     else:
-        print("Training the base model !")
+        print("Training the base model !!!")
         model.train()
+
+    model.evaluation(Xtest[:100], Ytest[:100])
