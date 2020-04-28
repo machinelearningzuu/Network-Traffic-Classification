@@ -1,4 +1,7 @@
 import numpy as np
+import sys
+np.set_printoptions(threshold=sys.maxsize)
+
 import pandas as pd
 from matplotlib import pyplot as plt
 import seaborn as sns
@@ -6,10 +9,11 @@ import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 import tensorflow as tf
 from tensorflow import keras
-from keras.layers import Dense, Input, Dropout
+from keras.layers import Dense, Input, Dropout, Embedding, LSTM
 from keras.models import model_from_json
 from keras.models import Model
 
+import keras.backend as K
 import logging
 logging.getLogger('tensorflow').disabled = True
 
@@ -59,7 +63,7 @@ class NetworkTrafficClassifier(object):
                             epochs=num_epoches,
                             validation_data = [self.Xtest, self.Ytest],
                             )
-        self.save_model(base_model_path,base_model_weights)
+        self.save_model(model_path,model_weights)
 
     def load_model(self, model_path, model_weights):
         json_file = open(model_path, 'r')
@@ -75,31 +79,6 @@ class NetworkTrafficClassifier(object):
         with open(model_path, "w") as json_file:
             json_file.write(model_json)
         self.model.save_weights(model_weights)
-
-    def transfer_learning(self):
-        inputs = Input(shape=(n_features,), name='inputs')
-        x = inputs
-        for layer in self.model.layers[1:-1]:
-            x = layer(x)
-            layer.trainable = False
-        x = Dense(denset, activation='relu', name='denset')(x)
-        outputs = Dense(self.num_classes, activation='softmax')(x)
-        self.model = Model(inputs, outputs)
-
-        self.model.compile(
-            loss='sparse_categorical_crossentropy',
-            optimizer='adam',
-            metrics=['accuracy']
-        )
-
-        self.history = self.model.fit(
-                            self.Xtrain,
-                            self.Ytrain,
-                            batch_size=batch_size,
-                            epochs=num_epoches,
-                            validation_data = [self.Xtest, self.Ytest],
-                            )
-        self.save_model(tl_model_path,tl_model_weights)
 
     def evaluation(self,X,Y):
         loss, accuracy = self.model.evaluate(X, Y, batch_size=batch_size)
@@ -126,25 +105,16 @@ class NetworkTrafficClassifier(object):
         plt.ylabel('True classes')
         plt.xlabel('Predicted classes')
         plt.savefig(confustion_img)
-        # plt.show()
+
+    def predicts(self,X):
+        return self.model.predict(X)
 
 if __name__ == "__main__":
     model = NetworkTrafficClassifier()
-    _, _, Xtrain, Xtest, Ytrain, Ytest = load_data()
-    if os.path.exists(base_model_path) and os.path.exists(base_model_weights):
+    _, _, Xtrain, Xtest, Ytrain, Ytest = load_data(False)
+    if os.path.exists(model_path) and os.path.exists(model_weights):
         print("Loading the base model !!!")
-        model.load_model(base_model_path,base_model_weights)
-
-        if not base_model:
-            if os.path.exists(tl_model_path) and os.path.exists(tl_model_weights):
-                print("Loading Transfer learning model !!!")
-                model.load_model(tl_model_path,tl_model_weights)
-            else:
-                print("Transfer Learning on new data !!!")
-                model.transfer_learning()
-
+        model.load_model(model_path,model_weights)
     else:
         print("Training the base model !!!")
         model.train()
-
-    model.evaluation(Xtest[:10000], Ytest[:10000])
