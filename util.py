@@ -7,6 +7,7 @@ from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
 from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import LabelEncoder
+from sklearn.preprocessing import OneHotEncoder
 from sklearn.model_selection import train_test_split
 from variables import*
 
@@ -16,29 +17,27 @@ def get_data(Train):
     csv_path = train_csv if Train else test_csv
     df = pd.read_csv(csv_path)
     class_names = df['activity'].values
-    unique_classes = set(class_names)
 
-    encoder = LabelEncoder()
-    encoder.fit(class_names)
-    labels = encoder.transform(class_names)
+    encoder = OneHotEncoder()
+    labels = encoder.fit_transform(class_names.reshape(-1,1)).toarray()
+
+    # encoder = LabelEncoder()
+    # encoder.fit(class_names)
+    # labels = encoder.transform(class_names)
 
     Inputs = df.iloc[:,1:].values
     scaler = StandardScaler()
     scaler.fit(Inputs)
     Inputs = scaler.transform(Inputs)
 
-    return encoder, unique_classes, Inputs, labels
+
+
+    return encoder, Inputs, labels
 
 
 def load_data(Train=True):
-    encoder, unique_classes, Inputs, labels = get_data(Train)
+    encoder, Inputs, labels = get_data(Train)
     Inputs, labels = shuffle(Inputs, labels)
-    Xtrain, Xtest, Ytrain, Ytest = train_test_split(
-                                                    Inputs,
-                                                    labels,
-                                                    test_size=validation_split,
-                                                    random_state=seed
-                                                    )
 
     # if not os.path.exists(pca_weights):
     #     pca = PCA(n_components=n_features)
@@ -49,4 +48,4 @@ def load_data(Train=True):
     # Xtrain = pca.transform(Xtrain)
     # Xtest  = pca.transform(Xtest)
 
-    return encoder, unique_classes, Xtrain, Xtest, Ytrain, Ytest
+    return encoder, Inputs, labels
