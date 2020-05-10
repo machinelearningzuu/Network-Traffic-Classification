@@ -47,19 +47,15 @@ class NetworkTrafficClassifier(object):
 
     @staticmethod
     def acc(y_true,y_pred):
-        print(y_pred.shape)
-        n_total = K.cast(K.shape(y_pred)[0], dtype='float32')
-        Plabels = K.cast(K.argmax(y_pred, axis=-1), dtype='float32') # label array
-        print(K.shape(Plabels))
-        print(K.shape(y_true))
-        correct_idx = K.cast(K.equal(y_true, Plabels), dtype='float32')
-        n_correct = K.sum(correct_idx)
-        # Pmax = K.cast(K.max(y_pred, axis=-1), dtype='float32')
-        # Pmax = Pmax * correct_idx
-        # mask = K.cast(K.greater(Pmax, custom_acc), dtype='float32')
+        targ = K.argmax(y_true, axis=-1)
+        pred = K.argmax(y_pred, axis=-1)
+        correct = K.cast(K.equal(targ, pred), dtype='float32')
 
-        # n_correct = K.sum(mask)
-        return n_correct/n_total
+        Pmax = K.cast(K.max(y_pred, axis=-1), dtype='float32')
+        Pmax = Pmax * correct
+        mask = K.cast(K.greater(Pmax, custom_acc), dtype='float32')
+
+        return K.mean(mask)
 
 
     def train(self):
@@ -94,11 +90,8 @@ class NetworkTrafficClassifier(object):
 
     def evaluation(self,X,Y):
         loss, accuracy = self.model.evaluate(X, Y, batch_size=batch_size)
-        Ypred = self.model.predict(X)
-        P = np.argmax(Ypred, axis=1)
         print("Test Loss : ", loss)
         print("Test Accuracy : ", accuracy)
-        print("Predicted Classes : \n", P)
 
     def predicts(self,X):
         return self.model.predict(X)
@@ -112,6 +105,3 @@ if __name__ == "__main__":
     else:
         print("Training the base model !!!")
         model.train()
-    encoder, X, Y = load_data(True)
-    P = model.predicts(X)
-    print(P.shape)
