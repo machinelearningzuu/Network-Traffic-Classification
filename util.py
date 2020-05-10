@@ -36,7 +36,8 @@ def get_data(Train):
     encoder = joblib.load(encoder_weights)
 
     if Train:
-        labels = encoder.transform(labels.reshape(-1,1)).toarray()
+        labels = encoder.transform(labels.reshape(-1,1))
+        labels = labels.toarray()
     return encoder, Inputs, labels
 
 
