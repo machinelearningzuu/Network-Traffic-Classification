@@ -20,6 +20,8 @@ logging.getLogger('tensorflow').disabled = True
 from variables import*
 from util import load_data
 import argparse
+import operator
+from collections import Counter
 
 '''  Use following command to run the script
 
@@ -112,8 +114,13 @@ class NetworkTrafficClassifier(object):
         for i in range(N):
            j = Ppred[i]
            Ponehot[i,j] = 1
-        Pclasses = self.encoder.inverse_transform(Ponehot)
-        return Pclasses
+        Pclasses = self.encoder.inverse_transform(Ponehot).reshape(-1,)
+        class_count = dict(Counter(Pclasses.tolist()))
+        class_count = sorted(class_count.items(),key=operator.itemgetter(1),reverse=True)
+        for label, value in class_count:
+            fraction = (value/N)*100
+            fraction = round(fraction, 3)
+            print("{} : {}%".format(label,fraction))
 
     def predicts(self,X):
         return self.model.predict(X)
@@ -139,5 +146,4 @@ if __name__ == "__main__":
         print("Training the base model !!!")
         model.train()
     model.evaluation()
-    Pclasses = model.predict_classes()
-    print(Pclasses)
+    model.predict_classes()
