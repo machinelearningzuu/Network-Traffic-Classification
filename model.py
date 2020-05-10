@@ -33,14 +33,16 @@ class NetworkTrafficClassifier(object):
         self.Y = labels
         self.encoder = encoder
         self.num_classes = int(labels.shape[1])
-        print("Dataset has {} Classes".format(self.num_classes))
+        print("Input Shape : {}".format(self.X.shape))
+        print("Label Shape : {}".format(self.Y.shape))
 
     def classifier(self):
         inputs = Input(shape=(n_features,), name='inputs')
-        x = Dense(dense1, activation='relu', name='dense1')(inputs)
-        x = Dense(dense2, activation='relu', name='dense2')(x)
-        x = Dense(dense3, activation='relu', name='dense3')(x)
-        x = Dense(dense4, activation='relu', name='dense4')(x)
+        x = Dense(dense1, activation='tanh', name='dense1')(inputs)
+        x = Dense(dense2, activation='tanh', name='dense2')(x)
+        x = Dense(dense3, activation='tanh', name='dense3')(x)
+        x = Dense(dense4, activation='tanh', name='dense4')(x)
+        x = Dense(denset, activation='relu', name='denset')(x)
         x = Dropout(keep_prob)(x)
         outputs = Dense(self.num_classes, activation='softmax', name='output')(x)
         self.model = Model(inputs, outputs)
@@ -90,7 +92,8 @@ class NetworkTrafficClassifier(object):
 
     def evaluation(self):
         Ypred = self.model.predict(self.X)
-        Pcorrect = Ypred > custom_acc
+        Ppred = np.max(Ypred, axis=-1)
+        Pcorrect = (Ppred > custom_acc)
         return np.mean(Pcorrect)
 
     def predicts(self,X):
@@ -105,4 +108,4 @@ if __name__ == "__main__":
     else:
         print("Training the base model !!!")
         model.train()
-    model.evaluation()
+    print(model.evaluation())

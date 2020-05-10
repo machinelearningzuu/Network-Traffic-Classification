@@ -35,13 +35,13 @@ def load_data(Train=True):
     encoder, Inputs, labels = get_data(Train)
     Inputs, labels = shuffle(Inputs, labels)
 
-    # if not os.path.exists(pca_weights):
-    #     pca = PCA(n_components=n_features)
-    #     pca.fit(Xtrain)
-    #     joblib.dump(pca, pca_weights)
+    if not os.path.exists(pca_weights):
+        print("Applying PCA !")
+        pca = PCA(n_components=n_features)
+        pca.fit(Inputs)
+        joblib.dump(pca, pca_weights)
 
-    # pca = joblib.load(pca_weights)
-    # Xtrain = pca.transform(Xtrain)
-    # Xtest  = pca.transform(Xtest)
+    pca = joblib.load(pca_weights)
+    Inputs = pca.transform(Inputs)
 
     return encoder, Inputs, labels
