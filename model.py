@@ -67,7 +67,8 @@ class NetworkTrafficClassifier(object):
         self.model.compile(
             loss='categorical_crossentropy',
             optimizer='adam',
-            metrics=['accuracy']
+            # metrics=['accuracy'],
+            metrics=[NetworkTrafficClassifier.acc]
         )
         self.history = self.model.fit(
                             self.X,
@@ -83,7 +84,8 @@ class NetworkTrafficClassifier(object):
         loaded_model.compile(
                         loss='categorical_crossentropy',
                         optimizer='adam',
-                        metrics=['accuracy']
+                        # metrics=['accuracy'],/
+                        metrics=[NetworkTrafficClassifier.acc]
                         )
         self.model = loaded_model
 
