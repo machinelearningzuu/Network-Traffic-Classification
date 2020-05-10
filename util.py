@@ -30,7 +30,7 @@ def get_data(Train):
 
     if not os.path.exists(encoder_weights):
         encoder = OneHotEncoder()
-        labels = encoder.fit(labels.reshape(-1,1))
+        encoder.fit(labels.reshape(-1,1))
         joblib.dump(encoder, encoder_weights)
 
     encoder = joblib.load(encoder_weights)
