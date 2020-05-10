@@ -12,6 +12,8 @@ denset = 128
 keep_prob = 0.3
 n_features = 15
 
+train_classes = 63
+
 batch_size = 128
 num_epoches = 40
 validation_split = 0.1
@@ -19,6 +21,8 @@ validation_split = 0.1
 custom_acc = 0.97
 
 #data paths and model weights
+scalar_weights = os.path.join(os.getcwd(), 'Weights/scalar.pickle')
+encoder_weights = os.path.join(os.getcwd(), 'Weights/encoder.pickle')
 pca_weights = os.path.join(os.getcwd(), 'Weights/pca.pickle')
 model_weights =  os.path.join(os.getcwd(), 'Weights/model.h5')
 

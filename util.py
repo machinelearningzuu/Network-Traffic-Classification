@@ -16,31 +16,41 @@ import joblib
 def get_data(Train):
     csv_path = train_csv if Train else test_csv
     df = pd.read_csv(csv_path)
-    class_names = df['activity'].values
 
-    encoder = OneHotEncoder()
-    labels = encoder.fit_transform(class_names.reshape(-1,1)).toarray()
-
+    labels = df['activity'].values
     Inputs = df.iloc[:,1:].values
-    scaler = StandardScaler()
-    scaler.fit(Inputs)
+
+    if not os.path.exists(scalar_weights):
+        scaler = StandardScaler()
+        scaler.fit(Inputs)
+        joblib.dump(scaler, scalar_weights)
+
+    scaler = joblib.load(scalar_weights)
     Inputs = scaler.transform(Inputs)
 
+    if not os.path.exists(encoder_weights):
+        encoder = OneHotEncoder()
+        labels = encoder.fit(labels.reshape(-1,1))
+        joblib.dump(encoder, encoder_weights)
+
+    encoder = joblib.load(encoder_weights)
+
+    if Train:
+        labels = encoder.transform(labels.reshape(-1,1)).toarray()
     return encoder, Inputs, labels
 
 
-def load_data(Train, is_pca):
+def load_data(Train):
     encoder, Inputs, labels = get_data(Train)
     Inputs, labels = shuffle(Inputs, labels)
 
-    if is_pca:
-        if not os.path.exists(pca_weights):
-            print("Applying PCA !")
-            pca = PCA(n_components=n_features)
-            pca.fit(Inputs)
-            joblib.dump(pca, pca_weights)
+    if not os.path.exists(pca_weights):
+        print("Applying PCA !")
+        pca = PCA(n_components=n_features)
+        pca.fit(Inputs)
+        joblib.dump(pca, pca_weights)
 
-        pca = joblib.load(pca_weights)
-        Inputs = pca.transform(Inputs)
+    pca = joblib.load(pca_weights)
+    Inputs = pca.transform(Inputs)
 
     return encoder, Inputs, labels

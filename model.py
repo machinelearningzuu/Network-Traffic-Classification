@@ -23,18 +23,19 @@ import argparse
 
 '''  Use following command to run the script
 
-                python model.py --data_set=Train --pca=True
+                python model.py --data_set=Train
 
 '''
 
 class NetworkTrafficClassifier(object):
-    def __init__(self, Train,is_pca):
+    def __init__(self, Train):
         self.Train = Train
-        encoder, Inputs, labels = load_data(Train, is_pca)
+        encoder, Inputs, labels = load_data(Train)
         self.X = Inputs
         self.Y = labels
         self.encoder = encoder
-        self.num_classes = int(labels.shape[1])
+        if Train:
+            self.num_classes = int(labels.shape[1])
         print("Input Shape : {}".format(self.X.shape))
         print("Label Shape : {}".format(self.Y.shape))
 
@@ -102,6 +103,18 @@ class NetworkTrafficClassifier(object):
                                         round(Punk,3))
                                         )
 
+    def predict_classes(self):
+        Ypred = self.model.predict(self.X)
+
+        N = Ypred.shape[0]
+        Ppred = np.argmax(Ypred, axis=-1)
+        Ponehot = np.zeros((N, train_classes), dtype=np.int64)
+        for i in range(N):
+           j = Ppred[i]
+           Ponehot[i,j] = 1
+        Pclasses = self.encoder.inverse_transform(Ponehot)
+        return Pclasses
+
     def predicts(self,X):
         return self.model.predict(X)
 
@@ -114,18 +127,11 @@ if __name__ == "__main__":
                         type=str,
                         help='predictions based on required dataset after training the model')
 
-    my_parser.add_argument('--pca',
-                        default= False,
-                        metavar='True or False',
-                        type=bool,
-                        help='Apply PCA or not')
-
     args = my_parser.parse_args()
 
     Train = True if args.data_set.lower() == 'train' else False
-    is_pca = args.pca
 
-    model = NetworkTrafficClassifier(Train, is_pca)
+    model = NetworkTrafficClassifier(Train)
     if os.path.exists(model_weights):
         print("Loading the base model !!!")
         model.load_model(model_weights)
@@ -133,3 +139,5 @@ if __name__ == "__main__":
         print("Training the base model !!!")
         model.train()
     model.evaluation()
+    Pclasses = model.predict_classes()
+    print(Pclasses)
