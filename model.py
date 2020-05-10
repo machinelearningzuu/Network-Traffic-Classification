@@ -88,10 +88,10 @@ class NetworkTrafficClassifier(object):
     def save_model(self ,model_weights):
         self.model.save(model_weights)
 
-    def evaluation(self,X,Y):
-        loss, accuracy = self.model.evaluate(X, Y, batch_size=batch_size)
-        print("Test Loss : ", loss)
-        print("Test Accuracy : ", accuracy)
+    def evaluation(self):
+        Ypred = self.model.predict(self.X)
+        Pcorrect = Ypred > custom_acc
+        return np.mean(Pcorrect)
 
     def predicts(self,X):
         return self.model.predict(X)
@@ -105,3 +105,4 @@ if __name__ == "__main__":
     else:
         print("Training the base model !!!")
         model.train()
+    model.evaluation()

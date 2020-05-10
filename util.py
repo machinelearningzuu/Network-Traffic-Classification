@@ -21,10 +21,6 @@ def get_data(Train):
     encoder = OneHotEncoder()
     labels = encoder.fit_transform(class_names.reshape(-1,1)).toarray()
 
-    # encoder = LabelEncoder()
-    # encoder.fit(class_names)
-    # labels = encoder.transform(class_names)
-
     Inputs = df.iloc[:,1:].values
     scaler = StandardScaler()
     scaler.fit(Inputs)
