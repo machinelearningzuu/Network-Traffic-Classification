@@ -2,15 +2,16 @@ import os
 
 base_model = True
 seed=42
+
 dense0 = 1024
 dense1 = 512
 dense2 = 512
-dense3 = 512
-dense4 = 512
+dense3 = 64
+dense4 = 64
 denset = 64
 keep_prob = 0.7
-output_dim = 256
-n_features = 10
+n_features = 48
+
 batch_size = 128
 num_epoches = 100
 validation_split = 0.1

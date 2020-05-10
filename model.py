@@ -47,6 +47,16 @@ class NetworkTrafficClassifier(object):
         outputs = Dense(self.num_classes, activation='softmax', name='output')(x)
         self.model = Model(inputs, outputs)
 
+        # inputs = Input(shape=(max_length,))
+        # x = Bidirectional(LSTM(size_lstm), name='bidirectional_lstm')(x)
+        # x = Dense(denseS, activation='relu', name='dense1')(x)
+        # x = Dense(denseS, activation='relu', name='dense2')(x)
+        # x = Dense(denseS, activation='relu', name='dense3')(x)
+        # outputs = Dense(size_output, activation='sigmoid', name='dense_out')(x)
+
+        # model = Model(inputs=inputs, outputs=outputs)
+        # self.model = model
+
     @staticmethod
     def acc(y_true,y_pred):
         targ = K.argmax(y_true, axis=-1)
@@ -93,8 +103,9 @@ class NetworkTrafficClassifier(object):
     def evaluation(self):
         Ypred = self.model.predict(self.X)
         Ppred = np.max(Ypred, axis=-1)
-        Pcorrect = (Ppred > custom_acc)
-        return np.mean(Pcorrect)
+        unk = (Ppred <= custom_acc)
+        Punk = np.mean(unk) * 100
+        print("Unknown Percentage : {}%".format(round(Punk,3)))
 
     def predicts(self,X):
         return self.model.predict(X)
@@ -108,4 +119,4 @@ if __name__ == "__main__":
     else:
         print("Training the base model !!!")
         model.train()
-    print(model.evaluation())
+    model.evaluation()
