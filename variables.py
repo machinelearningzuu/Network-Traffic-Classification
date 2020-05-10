@@ -6,14 +6,14 @@ seed=42
 dense0 = 1024
 dense1 = 512
 dense2 = 512
-dense3 = 64
-dense4 = 64
-denset = 64
-keep_prob = 0.7
-n_features = 48
+dense3 = 128
+dense4 = 128
+denset = 128
+keep_prob = 0.3
+n_features = 15
 
 batch_size = 128
-num_epoches = 100
+num_epoches = 40
 validation_split = 0.1
 
 custom_acc = 0.97

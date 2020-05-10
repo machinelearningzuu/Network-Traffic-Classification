@@ -26,22 +26,21 @@ def get_data(Train):
     scaler.fit(Inputs)
     Inputs = scaler.transform(Inputs)
 
-
-
     return encoder, Inputs, labels
 
 
-def load_data(Train=True):
+def load_data(Train, is_pca):
     encoder, Inputs, labels = get_data(Train)
     Inputs, labels = shuffle(Inputs, labels)
 
-    if not os.path.exists(pca_weights):
-        print("Applying PCA !")
-        pca = PCA(n_components=n_features)
-        pca.fit(Inputs)
-        joblib.dump(pca, pca_weights)
+    if is_pca:
+        if not os.path.exists(pca_weights):
+            print("Applying PCA !")
+            pca = PCA(n_components=n_features)
+            pca.fit(Inputs)
+            joblib.dump(pca, pca_weights)
 
-    pca = joblib.load(pca_weights)
-    Inputs = pca.transform(Inputs)
+        pca = joblib.load(pca_weights)
+        Inputs = pca.transform(Inputs)
 
     return encoder, Inputs, labels

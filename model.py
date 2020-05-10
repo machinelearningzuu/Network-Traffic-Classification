@@ -19,16 +19,18 @@ logging.getLogger('tensorflow').disabled = True
 
 from variables import*
 from util import load_data
+import argparse
 
 '''  Use following command to run the script
 
-                python -W ignore model.py
+                python model.py --data_set=Train --pca=True
 
 '''
 
 class NetworkTrafficClassifier(object):
-    def __init__(self, Train):
-        encoder, Inputs, labels = load_data(Train)
+    def __init__(self, Train,is_pca):
+        self.Train = Train
+        encoder, Inputs, labels = load_data(Train, is_pca)
         self.X = Inputs
         self.Y = labels
         self.encoder = encoder
@@ -46,16 +48,6 @@ class NetworkTrafficClassifier(object):
         x = Dropout(keep_prob)(x)
         outputs = Dense(self.num_classes, activation='softmax', name='output')(x)
         self.model = Model(inputs, outputs)
-
-        # inputs = Input(shape=(max_length,))
-        # x = Bidirectional(LSTM(size_lstm), name='bidirectional_lstm')(x)
-        # x = Dense(denseS, activation='relu', name='dense1')(x)
-        # x = Dense(denseS, activation='relu', name='dense2')(x)
-        # x = Dense(denseS, activation='relu', name='dense3')(x)
-        # outputs = Dense(size_output, activation='sigmoid', name='dense_out')(x)
-
-        # model = Model(inputs=inputs, outputs=outputs)
-        # self.model = model
 
     @staticmethod
     def acc(y_true,y_pred):
@@ -105,14 +97,35 @@ class NetworkTrafficClassifier(object):
         Ppred = np.max(Ypred, axis=-1)
         unk = (Ppred <= custom_acc)
         Punk = np.mean(unk) * 100
-        print("Unknown Percentage : {}%".format(round(Punk,3)))
+        print("Unknown {} data Percentage : {}%".format(
+                                        "Train" if self.Train else "Test",
+                                        round(Punk,3))
+                                        )
 
     def predicts(self,X):
         return self.model.predict(X)
 
 if __name__ == "__main__":
-    Train = False if os.path.exists(model_weights) else True
-    model = NetworkTrafficClassifier(Train)
+    parser = argparse.ArgumentParser()
+    my_parser = argparse.ArgumentParser(description='Model parameters and hyperparameters')
+
+    my_parser.add_argument('--data_set',
+                        metavar='train or test',
+                        type=str,
+                        help='predictions based on required dataset after training the model')
+
+    my_parser.add_argument('--pca',
+                        default= False,
+                        metavar='True or False',
+                        type=bool,
+                        help='Apply PCA or not')
+
+    args = my_parser.parse_args()
+
+    Train = True if args.data_set.lower() == 'train' else False
+    is_pca = args.pca
+
+    model = NetworkTrafficClassifier(Train, is_pca)
     if os.path.exists(model_weights):
         print("Loading the base model !!!")
         model.load_model(model_weights)
