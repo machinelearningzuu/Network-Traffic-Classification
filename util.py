@@ -44,14 +44,4 @@ def get_data(Train):
 def load_data(Train):
     encoder, Inputs, labels = get_data(Train)
     Inputs, labels = shuffle(Inputs, labels)
-
-    if not os.path.exists(pca_weights):
-        print("Applying PCA !")
-        pca = PCA(n_components=n_features)
-        pca.fit(Inputs)
-        joblib.dump(pca, pca_weights)
-
-    pca = joblib.load(pca_weights)
-    Inputs = pca.transform(Inputs)
-
     return encoder, Inputs, labels

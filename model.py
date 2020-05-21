@@ -42,14 +42,15 @@ class NetworkTrafficClassifier(object):
         print("Label Shape : {}".format(self.Y.shape))
 
     def classifier(self):
-        inputs = Input(shape=(n_features,), name='inputs')
-        x = Dense(dense1, activation='tanh', name='dense1')(inputs)
-        x = Dense(dense2, activation='tanh', name='dense2')(x)
-        x = Dense(dense3, activation='tanh', name='dense3')(x)
-        x = Dense(dense4, activation='tanh', name='dense4')(x)
-        x = Dense(denset, activation='relu', name='denset')(x)
+        inputs = Input(shape=(n_features,))
+        x = Dense(dense0, activation='tanh')(inputs)
+        x = Dense(dense1, activation='tanh')(x)
+        x = Dense(dense2, activation='tanh')(x)
+        x = Dense(dense3, activation='tanh')(x)
+        x = Dense(dense4, activation='tanh')(x)
+        x = Dense(denset, activation='relu')(x)
         x = Dropout(keep_prob)(x)
-        outputs = Dense(self.num_classes, activation='softmax', name='output')(x)
+        outputs = Dense(self.num_classes, activation='softmax')(x)
         self.model = Model(inputs, outputs)
 
     @staticmethod
@@ -66,12 +67,11 @@ class NetworkTrafficClassifier(object):
 
 
     def train(self):
-        self.classifier()
         self.model.compile(
             loss='categorical_crossentropy',
             optimizer='adam',
-            # metrics=['accuracy'],
-            metrics=[NetworkTrafficClassifier.acc]
+            metrics=['accuracy'],
+            # metrics=[NetworkTrafficClassifier.acc]
         )
         self.history = self.model.fit(
                             self.X,
@@ -80,15 +80,14 @@ class NetworkTrafficClassifier(object):
                             epochs=num_epoches,
                             validation_split=validation_split
                             )
-        self.save_model(model_weights)
 
     def load_model(self, model_weights):
         loaded_model = load_model(model_weights)
         loaded_model.compile(
                         loss='categorical_crossentropy',
                         optimizer='adam',
-                        # metrics=['accuracy'],/
-                        metrics=[NetworkTrafficClassifier.acc]
+                        metrics=['accuracy'],
+                        # metrics=[NetworkTrafficClassifier.acc]
                         )
         self.model = loaded_model
 
@@ -140,10 +139,12 @@ if __name__ == "__main__":
 
     model = NetworkTrafficClassifier(Train)
     if os.path.exists(model_weights):
-        print("Loading the base model !!!")
+        print("Loading the model !!!")
         model.load_model(model_weights)
     else:
-        print("Training the base model !!!")
+        print("Training the model !!!")
+        model.classifier()
         model.train()
-    model.evaluation()
-    model.predict_classes()
+        model.save_model(model_weights)
+    # model.evaluation()
+    # model.predict_classes()
