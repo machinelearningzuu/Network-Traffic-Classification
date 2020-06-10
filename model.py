@@ -9,9 +9,10 @@ import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 import tensorflow as tf
 # from tensorflow import keras
-from tensorflow.keras.layers import Dense, Input, Dropout, Embedding, LSTM
+from tensorflow.keras.layers import Dense, Input, Dropout, Embedding, LSTM, BatchNormalization
 from tensorflow.keras.models import model_from_json, load_model
 from tensorflow.keras.models import Model
+from tensorflow.keras.optimizer import adam
 
 import tensorflow.keras.backend as K
 import logging
@@ -43,13 +44,13 @@ class NetworkTrafficClassifier(object):
 
     def classifier(self):
         inputs = Input(shape=(n_features,))
-        x = Dense(dense0, activation='tanh')(inputs)
-        x = Dense(dense1, activation='tanh')(x)
-        x = Dense(dense2, activation='tanh')(x)
-        x = Dense(dense3, activation='tanh')(x)
-        x = Dense(dense4, activation='tanh')(x)
-        x = Dense(denset, activation='relu')(x)
-        x = Dropout(keep_prob)(x)
+        x = Dense(dense1, activation='relu')(inputs)
+        x = BatchNormalization()(x)
+        x = Dense(dense2, activation='relu')(x)
+        x = Dense(dense2, activation='relu')(x)
+        x = Dense(dense3, activation='relu')(x)
+        # x = Dense(dense3, activation='relu')(x)
+        # x = Dense(dense3, activation='relu')(x)
         outputs = Dense(self.num_classes, activation='softmax')(x)
         self.model = Model(inputs, outputs)
 
@@ -69,7 +70,7 @@ class NetworkTrafficClassifier(object):
     def train(self):
         self.model.compile(
             loss='categorical_crossentropy',
-            optimizer='adam',
+            optimizer=adam(learning_rate),
             metrics=['accuracy'],
             # metrics=[NetworkTrafficClassifier.acc]
         )
@@ -85,7 +86,7 @@ class NetworkTrafficClassifier(object):
         loaded_model = load_model(model_weights)
         loaded_model.compile(
                         loss='categorical_crossentropy',
-                        optimizer='adam',
+                        optimizer=adam(learning_rate),
                         metrics=['accuracy'],
                         # metrics=[NetworkTrafficClassifier.acc]
                         )
@@ -145,6 +146,6 @@ if __name__ == "__main__":
         print("Training the model !!!")
         model.classifier()
         model.train()
-        model.save_model(model_weights)
+        # model.save_model(model_weights)
     # model.evaluation()
     # model.predict_classes()
