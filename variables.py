@@ -31,3 +31,16 @@ test_csv = os.path.join(os.getcwd(), 'Datasets 0.5s/Test0.5s.csv')
 #Data Visulization
 acc_img = "Visualization/accuracy_comparison.png"
 loss_img = "Visualization/loss_comparison.png"
+
+TrainApps = ['Fb', 'Gm', 'Msg', 'Ut', 'Vb']
+TestApps = ['In', 'Wt']
+img_corr = "Visualization/Correlation/{}_VS_{}.png"
+FullAppNames = {
+                'Fb' : 'FaceBook',
+                'Gm' : 'Gmail',
+                'Msg': 'Massenger',
+                'Ut' : 'YouTube',
+                'Vb' : 'Viber',
+                'In' : 'Instagram',
+                'Wt' : 'WhatsApp'
+                }
