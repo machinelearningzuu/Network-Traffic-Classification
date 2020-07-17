@@ -11,19 +11,23 @@ n_features = 48
 
 train_classes = 63
 
-learning_rate = 0.0001
-batch_size = 128
-num_epoches = 100
+learning_rate = 0.001
+batch_size = 20
+num_epoches = 500
 validation_split = 0.1
 
-custom_acc = 0.97
+custom_acc = 0.9
 
 #data paths and model weights
 scalar_weights = os.path.join(os.getcwd(), 'Weights/scalar.pickle')
 encoder_weights = os.path.join(os.getcwd(), 'Weights/encoder.pickle')
 model_weights =  os.path.join(os.getcwd(), 'Weights/model.h5')
 
-# train_csv = os.path.join(os.getcwd(), 'Datasets 0.5s/Train0.5s.csv')
-# test_csv = os.path.join(os.getcwd(), 'Datasets 0.5s/Test0.5s.csv')
-train_csv = os.path.join(os.getcwd(), '0.2 csv/Train0.2s.csv')
-test_csv = os.path.join(os.getcwd(), '0.2 csv/Test0.2s.csv')
+train_csv = os.path.join(os.getcwd(), 'Datasets 0.5s/Train0.5s.csv')
+test_csv = os.path.join(os.getcwd(), 'Datasets 0.5s/Test0.5s.csv')
+# train_csv = os.path.join(os.getcwd(), '0.2 csv/Train0.2s.csv')
+# test_csv = os.path.join(os.getcwd(), '0.2 csv/Test0.2s.csv')
+
+#Data Visulization
+acc_img = "Visualization/accuracy_comparison.png"
+loss_img = "Visualization/loss_comparison.png"

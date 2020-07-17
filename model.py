@@ -12,7 +12,7 @@ import tensorflow as tf
 from tensorflow.keras.layers import Dense, Input, Dropout, Embedding, LSTM, BatchNormalization
 from tensorflow.keras.models import model_from_json, load_model
 from tensorflow.keras.models import Model
-from tensorflow.keras.optimizer import adam
+from tensorflow.keras.optimizers import Adam
 
 import tensorflow.keras.backend as K
 import logging
@@ -44,13 +44,13 @@ class NetworkTrafficClassifier(object):
 
     def classifier(self):
         inputs = Input(shape=(n_features,))
-        x = Dense(dense1, activation='relu')(inputs)
-        x = BatchNormalization()(x)
-        x = Dense(dense2, activation='relu')(x)
-        x = Dense(dense2, activation='relu')(x)
-        x = Dense(dense3, activation='relu')(x)
-        # x = Dense(dense3, activation='relu')(x)
-        # x = Dense(dense3, activation='relu')(x)
+        x = Dense(dense1, activation='tanh')(inputs)
+        # x = BatchNormalization()(x)
+        x = Dense(dense2, activation='tanh')(x)
+        x = Dense(dense2, activation='tanh')(x)
+        x = Dense(dense3, activation='tanh')(x)
+        x = Dense(dense3, activation='tanh')(x)
+        x = Dense(dense3, activation='tanh')(x)
         outputs = Dense(self.num_classes, activation='softmax')(x)
         self.model = Model(inputs, outputs)
 
@@ -70,9 +70,9 @@ class NetworkTrafficClassifier(object):
     def train(self):
         self.model.compile(
             loss='categorical_crossentropy',
-            optimizer=adam(learning_rate),
-            metrics=['accuracy'],
-            # metrics=[NetworkTrafficClassifier.acc]
+            optimizer=Adam(learning_rate),
+            # metrics=['accuracy'],
+            metrics=[NetworkTrafficClassifier.acc]
         )
         self.history = self.model.fit(
                             self.X,
@@ -82,13 +82,36 @@ class NetworkTrafficClassifier(object):
                             validation_split=validation_split
                             )
 
+    def plot_metrics(self):
+        loss_train = self.history.history['loss']
+        loss_val = self.history.history['val_loss']
+        plt.plot(np.arange(1,num_epoches+1), loss_train, 'r', label='Training loss')
+        plt.plot(np.arange(1,num_epoches+1), loss_val, 'b', label='validation loss')
+        plt.title('Training and Validation loss')
+        plt.xlabel('Epochs')
+        plt.ylabel('Loss')
+        plt.savefig(loss_img)
+        plt.legend()
+        plt.show()
+
+        acc_train = self.history.history['acc']
+        acc_val = self.history.history['val_acc']
+        plt.plot(np.arange(1,num_epoches+1), acc_train, 'r', label='Training Accuracy')
+        plt.plot(np.arange(1,num_epoches+1), acc_val, 'b', label='validation Accuracy')
+        plt.title('Training and Validation Accuracy')
+        plt.xlabel('Epochs')
+        plt.ylabel('Accuracy')
+        plt.savefig(acc_img)
+        plt.legend()
+        plt.show()
+
     def load_model(self, model_weights):
         loaded_model = load_model(model_weights)
         loaded_model.compile(
                         loss='categorical_crossentropy',
-                        optimizer=adam(learning_rate),
-                        metrics=['accuracy'],
-                        # metrics=[NetworkTrafficClassifier.acc]
+                        optimizer=Adam(learning_rate),
+                        # metrics=['accuracy'],
+                        metrics=[NetworkTrafficClassifier.acc]
                         )
         self.model = loaded_model
 
@@ -146,6 +169,7 @@ if __name__ == "__main__":
         print("Training the model !!!")
         model.classifier()
         model.train()
-        # model.save_model(model_weights)
-    # model.evaluation()
+        model.plot_metrics()
+        model.save_model(model_weights)
+    model.evaluation()
     # model.predict_classes()
