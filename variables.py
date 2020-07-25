@@ -7,14 +7,16 @@ dense1 = 1024
 dense2 = 512
 dense3 = 128
 keep_prob = 0.3
-n_features = 48
+n_components = 24
+n_features = n_components
+# n_features = 48
 
 train_classes = 63
 
-learning_rate = 0.001
-batch_size = 20
+learning_rate = 0.0001
+batch_size = 128
 num_epoches = 500
-validation_split = 0.1
+validation_split = 0.15
 
 custom_acc = 0.9
 
@@ -29,6 +31,7 @@ test_csv = os.path.join(os.getcwd(), 'Datasets 0.5s/Test0.5s.csv')
 # test_csv = os.path.join(os.getcwd(), '0.2 csv/Test0.2s.csv')
 
 #Data Visulization
+plot_step = 100
 acc_img = "Visualization/accuracy_comparison.png"
 loss_img = "Visualization/loss_comparison.png"
 

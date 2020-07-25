@@ -44,13 +44,19 @@ class NetworkTrafficClassifier(object):
 
     def classifier(self):
         inputs = Input(shape=(n_features,))
-        x = Dense(dense1, activation='tanh')(inputs)
-        # x = BatchNormalization()(x)
-        x = Dense(dense2, activation='tanh')(x)
-        x = Dense(dense2, activation='tanh')(x)
-        x = Dense(dense3, activation='tanh')(x)
-        x = Dense(dense3, activation='tanh')(x)
-        x = Dense(dense3, activation='tanh')(x)
+        x = Dense(dense1, activation='relu')(inputs)
+        x = Dense(dense2, activation='relu')(x)
+        x = Dense(dense2, activation='relu')(x)
+        x = Dense(dense2, activation='relu')(x)
+        x = Dense(dense2, activation='relu')(x)
+        x = BatchNormalization()(x)
+        x = Dropout(keep_prob)(x)
+        x = Dense(dense3, activation='relu')(x)
+        x = Dense(dense3, activation='relu')(x)
+        x = Dense(dense3, activation='relu')(x)
+        x = Dense(dense3, activation='relu')(x)
+        x = BatchNormalization()(x)
+        x = Dropout(keep_prob)(x)
         outputs = Dense(self.num_classes, activation='softmax')(x)
         self.model = Model(inputs, outputs)
 
@@ -83,10 +89,14 @@ class NetworkTrafficClassifier(object):
                             )
 
     def plot_metrics(self):
+        plot_steps = num_epoches // plot_step
+
         loss_train = self.history.history['loss']
         loss_val = self.history.history['val_loss']
-        plt.plot(np.arange(1,num_epoches+1), loss_train, 'r', label='Training loss')
-        plt.plot(np.arange(1,num_epoches+1), loss_val, 'b', label='validation loss')
+        loss_train = [loss for i,loss in enumerate(loss_train) if (i+1)%plot_step == 0]
+        loss_val = [loss for i,loss in enumerate(loss_val) if (i+1)%plot_step == 0]
+        plt.plot(np.arange(1,plot_steps+1), loss_train, 'r', label='Training loss')
+        plt.plot(np.arange(1,plot_steps+1), loss_val, 'b', label='validation loss')
         plt.title('Training and Validation loss')
         plt.xlabel('Epochs')
         plt.ylabel('Loss')
@@ -96,8 +106,10 @@ class NetworkTrafficClassifier(object):
 
         acc_train = self.history.history['acc']
         acc_val = self.history.history['val_acc']
-        plt.plot(np.arange(1,num_epoches+1), acc_train, 'r', label='Training Accuracy')
-        plt.plot(np.arange(1,num_epoches+1), acc_val, 'b', label='validation Accuracy')
+        acc_train = [acc for i,acc in enumerate(acc_train) if (i+1)%plot_step == 0]
+        acc_val = [acc for i,acc in enumerate(acc_val) if (i+1)%plot_step == 0]
+        plt.plot(np.arange(1,plot_steps+1), acc_train, 'r', label='Training Accuracy')
+        plt.plot(np.arange(1,plot_steps+1), acc_val, 'b', label='validation Accuracy')
         plt.title('Training and Validation Accuracy')
         plt.xlabel('Epochs')
         plt.ylabel('Accuracy')
@@ -148,6 +160,19 @@ class NetworkTrafficClassifier(object):
     def predicts(self,X):
         return self.model.predict(X)
 
+    def run(self):
+        if os.path.exists(model_weights):
+            print("Loading the model !!!")
+            self.load_model(model_weights)
+        else:
+            print("Training the model !!!")
+            self.classifier()
+            self.train()
+            self.plot_metrics()
+            self.save_model(model_weights)
+        self.evaluation()
+        # self.predict_classes()
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     my_parser = argparse.ArgumentParser(description='Model parameters and hyperparameters')
@@ -162,14 +187,4 @@ if __name__ == "__main__":
     Train = True if args.data_set.lower() == 'train' else False
 
     model = NetworkTrafficClassifier(Train)
-    if os.path.exists(model_weights):
-        print("Loading the model !!!")
-        model.load_model(model_weights)
-    else:
-        print("Training the model !!!")
-        model.classifier()
-        model.train()
-        model.plot_metrics()
-        model.save_model(model_weights)
-    model.evaluation()
-    # model.predict_classes()
+    model.run()

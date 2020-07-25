@@ -27,7 +27,12 @@ def get_data(Train):
         joblib.dump(scaler, scalar_weights)
 
     scaler = joblib.load(scalar_weights)
-    Inputs = scaler.transform(Inputs)
+    # Inputs = scaler.transform(Inputs)
+
+    pca = PCA(n_components=n_components)
+    pca.fit(Inputs)
+
+    Inputs = pca.transform(Inputs)
 
     if not os.path.exists(encoder_weights):
         encoder = OneHotEncoder()
@@ -116,4 +121,4 @@ def visualize_correlation():
     DataDict = get_apps_data(Xtrain, Xtest, Trainlabels, Testlabels)
     plot_data(DataDict)
 
-visualize_correlation()
+# visualize_correlation()
