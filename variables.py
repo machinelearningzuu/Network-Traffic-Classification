@@ -35,7 +35,7 @@ plot_step = 100
 acc_img = "Visualization/accuracy_comparison.png"
 loss_img = "Visualization/loss_comparison.png"
 
-TrainApps = ['Fb', 'Gm', 'Msg', 'Ut', 'Vb']
+TrainApps = ['Fb', 'Gm', 'Msg', 'Ut', 'Vb', 'Sk']
 TestApps = ['In', 'Wt']
 img_corr = "Visualization/Correlation/{}_VS_{}.png"
 FullAppNames = {
@@ -45,5 +45,6 @@ FullAppNames = {
                 'Ut' : 'YouTube',
                 'Vb' : 'Viber',
                 'In' : 'Instagram',
-                'Wt' : 'WhatsApp'
+                'Wt' : 'WhatsApp',
+                'Sk' : 'Skype'
                 }
