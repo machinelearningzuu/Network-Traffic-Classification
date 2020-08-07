@@ -58,6 +58,18 @@ def get_data_for_one_app(app_name, labels):
     idx = (app_names == app_name)
     return idx
 
+def get_single_app_percentage(trainApp, Pclasses):
+    app_len = len(trainApp)
+    app_names = pd.Series(Pclasses).astype(str).str[:app_len].values
+    idx = (app_names == trainApp)
+    return np.sum(idx)/len(Pclasses) * 100
+
+def get_app_percentage(Pclasses):
+    for app in TrainApps:
+        percentage = get_single_app_percentage(app, Pclasses)
+        print("{} : {}%".format(FullAppNames[app], round(percentage, 3)))
+
+
 def get_apps_data(TrainInputs, TestInputs, Trainlabels, Testlabels):
     DataDict = {app: '' for app in TrainApps + TestApps}
     for app in TrainApps:
@@ -120,5 +132,42 @@ def visualize_correlation():
 
     DataDict = get_apps_data(Xtrain, Xtest, Trainlabels, Testlabels)
     plot_data(DataDict)
+
+def app_data():
+    dfTrain = pd.read_csv(train_csv)
+    dfTest  = pd.read_csv(test_csv)
+
+    Trainlabels = dfTrain['activity']
+    TrainInputs = dfTrain.iloc[:,1:].values
+
+    Testlabels  = dfTest['activity']
+    TestInputs  = dfTest.iloc[:,1:].values
+
+    scaler = StandardScaler()
+    scaler.fit(TrainInputs)
+
+    # TrainInputs = scaler.transform(TrainInputs)
+    # TestInputs  = scaler.transform(TestInputs)
+
+    pca = PCA(n_components=n_components)
+    pca.fit(TrainInputs)
+
+    TrainInputs = pca.transform(TrainInputs)
+    TestInputs  = pca.transform(TestInputs)
+
+    TrainDataDict = {app: '' for app in TrainApps}
+    TestDataDict  = {app: '' for app in TestApps}
+
+    for app in TrainApps:
+        idx = get_data_for_one_app(app, Trainlabels)
+        data = TrainInputs[idx]
+        TrainDataDict[app] = data
+
+    for app in TestApps:
+        idx = get_data_for_one_app(app, Testlabels)
+        data = TestInputs[idx]
+        TestDataDict[app] = data
+
+    return TrainDataDict, TestDataDict
 
 # visualize_correlation()

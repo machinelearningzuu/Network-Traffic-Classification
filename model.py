@@ -19,7 +19,7 @@ import logging
 logging.getLogger('tensorflow').disabled = True
 
 from variables import*
-from util import load_data
+from util import*
 import argparse
 import operator
 from collections import Counter
@@ -160,6 +160,33 @@ class NetworkTrafficClassifier(object):
     def predicts(self,X):
         return self.model.predict(X)
 
+    def predict_app(self):
+        TrainDataDict, TestDataDict = app_data()
+        if Train:
+            for app, data in TrainDataDict.items():
+                print(FullAppNames[app])
+                Pclasses = self.app_prediction(data)
+                get_app_percentage(Pclasses)
+                print("\n")
+        else:
+            for app, data in TestDataDict.items():
+                print(FullAppNames[app])
+                Pclasses = self.app_prediction(data)
+                get_app_percentage(Pclasses)
+                print("\n")
+
+
+    def app_prediction(self, data):
+        Ypred = self.model.predict(data)
+        N = Ypred.shape[0]
+        Ppred = np.argmax(Ypred, axis=-1)
+        Ponehot = np.zeros((N, train_classes), dtype=np.int64)
+        for i in range(N):
+           j = Ppred[i]
+           Ponehot[i,j] = 1
+        Pclasses = self.encoder.inverse_transform(Ponehot).reshape(-1,)
+        return Pclasses
+
     def run(self):
         if os.path.exists(model_weights):
             print("Loading the model !!!")
@@ -168,9 +195,10 @@ class NetworkTrafficClassifier(object):
             print("Training the model !!!")
             self.classifier()
             self.train()
-            self.plot_metrics()
-            # self.save_model(model_weights)
+            # self.plot_metrics()
+            self.save_model(model_weights)
         self.evaluation()
+        self.predict_app()
         # self.predict_classes()
 
 if __name__ == "__main__":

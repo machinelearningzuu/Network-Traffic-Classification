@@ -14,7 +14,7 @@ n_features = n_components
 train_classes = 63
 
 learning_rate = 0.0001
-batch_size = 128
+batch_size = 64
 num_epoches = 500
 validation_split = 0.15
 
