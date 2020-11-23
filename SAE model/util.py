@@ -173,5 +173,3 @@ def app_data():
         TestDataDict[app] = data
 
     return TrainDataDict, TestDataDict
-
-# visualize_correlation()
