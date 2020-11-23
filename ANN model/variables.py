@@ -10,7 +10,7 @@ n_classes = 63
 
 learning_rate = 0.0001
 batch_size = 64
-num_epoches = 200
+num_epoches = 20
 validation_split = 0.15
 custom_acc = 0.9
 

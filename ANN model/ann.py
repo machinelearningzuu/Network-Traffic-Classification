@@ -57,13 +57,7 @@ class TrafficClassifier(object):
             correct = K.cast(K.equal(targ, pred), dtype='float32')
             Pmax = K.cast(K.max(y_pred, axis=-1), dtype='float32')
 
-            assert tf.math.reduce_all(
-                            tf.math.equal(
-                                        K.shape(correct), 
-                                        K.shape(Pmax)
-                                         )
-                                     ),"Invalid Dimension in custom accuracy"
-            Pmax = tf.multiply(Pmax , correct)
+            Pmax = Pmax * correct
             mask = K.cast(K.greater(Pmax, custom_acc), dtype='float32')
 
             return K.mean(mask)
@@ -74,11 +68,11 @@ class TrafficClassifier(object):
         self.model.compile(
             loss='categorical_crossentropy',
             optimizer=Adam(learning_rate),
-            metrics=['accuracy']
-            # metrics=[
-            #     TrafficClassifier.network_acc(
-            #                             custom_acc=custom_acc
-            #                                  )]
+            # metrics=['accuracy']
+            metrics=[
+                TrafficClassifier.network_acc(
+                                        custom_acc=custom_acc
+                                             )]
         )
         self.history = self.model.fit(
                             self.X,
@@ -93,11 +87,11 @@ class TrafficClassifier(object):
         loaded_model.compile(
                         loss='categorical_crossentropy',
                         optimizer=Adam(learning_rate),
-                        metrics=['accuracy']
-                        # metrics=[
-                        #     TrafficClassifier.network_acc(
-                        #                             custom_acc=custom_acc
-                        #                                 )]
+                        # metrics=['accuracy']
+                        metrics=[
+                            TrafficClassifier.network_acc(
+                                                    custom_acc=custom_acc
+                                                        )]
                         )
         self.model = loaded_model
 
