@@ -52,7 +52,7 @@ def save_and_load_encoder(labels, csv_path=train_csv):
 def save_and_load_scalar(Inputs, csv_path=train_csv):
     if csv_path == train_csv:
         if not os.path.exists(scalar_weights):
-            scaler = MinMaxScaler()
+            scaler = StandardScaler()
             scaler.fit(Inputs)
             joblib.dump(scaler, scalar_weights)
 

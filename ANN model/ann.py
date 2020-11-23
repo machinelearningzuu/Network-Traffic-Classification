@@ -74,11 +74,11 @@ class TrafficClassifier(object):
         self.model.compile(
             loss='categorical_crossentropy',
             optimizer=Adam(learning_rate),
-            # metrics=['accuracy'],
-            metrics=[
-                TrafficClassifier.network_acc(
-                                        custom_acc=custom_acc
-                                             )]
+            metrics=['accuracy']
+            # metrics=[
+            #     TrafficClassifier.network_acc(
+            #                             custom_acc=custom_acc
+            #                                  )]
         )
         self.history = self.model.fit(
                             self.X,
@@ -93,11 +93,11 @@ class TrafficClassifier(object):
         loaded_model.compile(
                         loss='categorical_crossentropy',
                         optimizer=Adam(learning_rate),
-                        # metrics=['accuracy'],
-                        metrics=[
-                            TrafficClassifier.network_acc(
-                                                    custom_acc=custom_acc
-                                                        )]
+                        metrics=['accuracy']
+                        # metrics=[
+                        #     TrafficClassifier.network_acc(
+                        #                             custom_acc=custom_acc
+                        #                                 )]
                         )
         self.model = loaded_model
 
@@ -133,10 +133,37 @@ class TrafficClassifier(object):
             fraction = round(fraction, 3)
             print("{} : {}%".format(label,fraction))
 
-    def predicts(self,X):
-        return self.model.predict(X)
+    def bin_probability(self,Confidence):
+        bins = np.linspace(0, 1, n_bins)
+        digitized = np.digitize(Confidence, bins)
+        return digitized
 
-    # def predict_distribution():
+    def plot_histogram(self, x1, x2):
+        plt.hist(
+                [x1, x2], 
+                bins = n_bins,
+                histtype ='bar',
+                color = colors, 
+                label=names
+                )
+
+        plt.legend()
+        plt.xlabel('confidence')
+        plt.ylabel('Amount')
+        plt.title('Confidence distribution of Train and Test data')
+        plt.savefig(confidence_img)
+        plt.show()
+
+    def predict_distribution(self):
+        Ptrain = self.model.predict(self.X)
+        Ptest = self.model.predict(self.Xtest)
+
+        ConfTrain = np.max(Ptrain, axis=-1)
+        ConfTest = np.max(Ptest, axis=-1)
+
+        ConfTrain_bin = self.bin_probability(ConfTrain) / n_bins
+        ConfTest_bin = self.bin_probability(ConfTest) / n_bins
+        self.plot_histogram(ConfTrain_bin, ConfTest_bin)
 
     def run(self):
         if os.path.exists(model_weights):
@@ -148,6 +175,7 @@ class TrafficClassifier(object):
             self.train()
             self.save_model()
         self.unknown_evaluation()
+        self.predict_distribution()
 
 if __name__ == "__main__":
     model = TrafficClassifier()

@@ -14,10 +14,17 @@ num_epoches = 200
 validation_split = 0.15
 custom_acc = 0.9
 
-#data paths and model weights
-scalar_weights = os.path.join(os.getcwd(), 'Weights/scalar.pickle')
-encoder_weights = os.path.join(os.getcwd(), 'Weights/encoder.pickle')
-model_weights =  os.path.join(os.getcwd(), 'Weights/model.h5')
+#data paths
+test_csv = 'Data/Test.csv'
+train_csv = 'Data/Train.csv'
 
-train_csv = os.path.join(os.getcwd(), 'Data/Train.csv')
-test_csv = os.path.join(os.getcwd(), 'Data/Test.csv')
+#model weights
+model_weights =  'Weights/model.h5'
+scalar_weights = 'Weights/scalar.pickle'
+encoder_weights = 'Weights/encoder.pickle'
+
+#visualization
+n_bins = 10
+colors = ['#E69F00', '#56B4E9']
+names = ['Train Confidence', 'Test Confidence']
+confidence_img = 'visualization/confidence_distribution.png'
