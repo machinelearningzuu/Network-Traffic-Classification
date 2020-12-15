@@ -133,9 +133,15 @@ class TrafficClassifier(object):
         return digitized
 
     def plot_histogram(self, x1, x2):
+        Wx1 = np.empty(x1.shape)
+        Wx1.fill(1/len(x1))
+        Wx2 = np.empty(x2.shape)
+        Wx2.fill(1/len(x2))
+
         plt.hist(
                 [x1, x2], 
                 bins = n_bins,
+                weights=[Wx1, Wx2],
                 histtype ='bar',
                 color = colors, 
                 label=names
@@ -143,7 +149,7 @@ class TrafficClassifier(object):
 
         plt.legend()
         plt.xlabel('confidence')
-        plt.ylabel('Amount')
+        plt.ylabel('Distribution')
         plt.title('Confidence distribution of Train and Test data')
         plt.savefig(confidence_img)
         plt.show()
