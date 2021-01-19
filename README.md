@@ -1,4 +1,4 @@
-# Network Traffic Classification
+# Network Traffic Classification and Anomaly Detection
 
 Deep Learning model for analysis and identify the application for given Teletraffic pattern. Experiment with different models including MLPs and CNNs. Final object 
 is to detect anomaly apps with unusual traffic patterns.
