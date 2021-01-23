@@ -41,6 +41,7 @@ class TrafficClassifier(object):
         x = MaxPool2D(pool_size=(2, 2), strides=(2,2))(x)
         x = Flatten()(x)
         x = Dense(128, activation='relu')(x)
+        x = Dropout(keep_prob)(x)
         outputs = Dense(n_classes, activation='softmax')(x)
         self.model = Model(inputs, outputs)
         self.model.summary()

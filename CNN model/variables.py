@@ -10,9 +10,9 @@ n_classes = 63
 initial_shape = (6,8)
 input_shape = (28,28,1)
 
-learning_rate = 0.0001
-batch_size = 32
-num_epoches = 100
+learning_rate = 0.001
+batch_size = 128
+num_epoches = 10
 validation_split = 0.1
 custom_acc = 0.9
 
