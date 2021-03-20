@@ -35,3 +35,4 @@ confidence_img = 'visualization/confidence_distribution.png'
 
 #Create main CSV
 inout_columns = ['frame.time_delta_displayed', 'frame.len', 'data.len']
+vis_inout_columns = ['frame.time_delta_displayed', 'frame.len', 'data.len', 'frame.time_delta_displayed', 'frame.len', 'data.len']
