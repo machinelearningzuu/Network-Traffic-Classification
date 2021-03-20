@@ -28,6 +28,7 @@ encoder_weights = 'Weights/encoder.pickle'
 
 #visualization
 n_bins = 10
+n_images = 100
 colors = ['#E69F00', '#56B4E9']
 names = ['Train Confidence', 'Test Confidence']
 confidence_img = 'visualization/confidence_distribution.png'

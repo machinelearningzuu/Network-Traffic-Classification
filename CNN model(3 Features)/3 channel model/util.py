@@ -1,5 +1,6 @@
 import os
 import joblib
+import cv2 as cv
 import numpy as np
 import pandas as pd
 from collections import Counter
@@ -71,7 +72,22 @@ def configure_cnn_inputs(X):
     X = X.reshape(-1, input_shape[0], input_shape[1], input_shape[2])
     return X
 
+def plot_images(X):
+    image_idxs = np.random.choice(len(X), n_images)
+    Xplot = X[image_idxs]
+
+    if not os.path.exists('Dataset/images'):
+        os.makedirs('Dataset/images')
+
+    for i,I in enumerate(Xplot):
+        print(I.shape)
+        I = (I * 255).astype(np.uint8)
+        cv.imwrite('Dataset/images/'+str(i)+'.png', I) 
+
 def load_data():
     X, Y = get_data(train_csv)
     X = configure_cnn_inputs(X)
+    plot_images(X)
     return X, Y
+
+load_data()
