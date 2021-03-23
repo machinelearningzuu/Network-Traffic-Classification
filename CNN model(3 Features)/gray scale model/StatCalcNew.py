@@ -20,24 +20,32 @@ def prepare_values(in_file, out_file, total_files):
 
         in_values = get_values(in_df)
         out_values = get_values(out_df)
-        data_values = np.concatenate([in_values,out_values])
+
+        if len(in_values) > len(out_values):
+            in_values = in_values[np.random.choice(len(in_values), len(out_values), replace=False)]
+        elif len(in_values) < len(out_values):
+            out_values = out_values[np.random.choice(len(out_values), len(in_values), replace=False)]
+        
+        data_values = np.concatenate([in_values,out_values], axis=1)
+        data_csv = data_values
 
     elif (in_file in total_files) and (out_file not in total_files):
         in_df = pd.read_csv('data\\'+in_file)
         data_values = get_values(in_df)
+        N, K = data_values.shape
+        data_csv = np.concatenate([data_values,np.zeros((N, K))], axis=1)
 
     elif (in_file not in total_files) and (out_file in total_files):
         out_df = pd.read_csv('data\\'+out_file)
         data_values = get_values(out_df)
+        N, K = data_values.shape
+        data_csv = np.concatenate([np.zeros((N, K)), data_values], axis=1)
 
+    data_values = np.resize(data_values,(input_shape[0],input_shape[1]))
     data_values = data_values.reshape(-1,)
-    if len(data_values) >= input_size:
-        data_values = data_values[:input_size]
-    else:
-        data_values = np.array(data_values.tolist() + [0] * (input_size - len(data_values)))
-    
+
     assert len(data_values) == input_size, "data vector should contain 784 components"
-    return data_values
+    return data_values,data_csv
 
 source_dir = Path(csv_dir)
 
@@ -50,19 +58,31 @@ csv_files.sort(key = lambda x: x.split('\\')[-1].split('.')[0])
 total_files = [str(file).split(csv_dir)[1] for file in source_dir.glob('**/*.csv')]
 data = []
 
-for csv_index in csv_files:
+for i, csv_index in enumerate(csv_files):
     in_file = '.'.join([csv_index,'in','csv'])
     out_file = '.'.join([csv_index,'out','csv'])
-    activity = {'activity': csv_index.split('\\')[-1]}
+    act = csv_index.split('\\')[-1].split('.')[0][:-1]
+    activity = {'activity': act}
+    if len(activity) > 0:
+        values, csv_values = prepare_values(in_file, out_file, total_files)
 
-    values = prepare_values(in_file, out_file, total_files)
+        cols = np.arange(1,input_size+1)
+        file_data = {**activity, **dict(zip(cols, values))}
+        csv_file_data = np.concatenate([np.array([act] * len(csv_values)).reshape(-1,1), csv_values], axis=1)
 
-    cols = np.arange(1,input_size+1)
-    file_data = {**activity, **dict(zip(cols, values))}
-    data.append(file_data)
+        if i==0:
+            data_csv = csv_file_data
+        else:
+            data_csv = np.concatenate([data_csv, csv_file_data])
+
+        data.append(file_data)
 
 final_df = pd.DataFrame(data)
 final_df.dropna(subset=final_df.columns.tolist()[1:], how='all', inplace=True)
 final_df.fillna(0, inplace=True)
-final_df['activity'] = final_df['activity'].apply(lambda x:re.sub(r'^([a-zA-Z]+).*', r'\1',x))
 final_df.to_csv(os.path.join(current_dir,'NewData.csv') , index=False)
+
+vis_df = pd.DataFrame(data=data_csv, columns=vis_inout_columns)
+vis_df.dropna(subset=vis_df.columns.tolist()[1:], how='all', inplace=True)
+vis_df.fillna(0, inplace=True)
+vis_df.to_csv(os.path.join(current_dir,'visualize_new_data.csv') , index=False)

@@ -16,6 +16,7 @@ def get_data(csv_path):
 
     labels = df['activity'].values
     Inputs = df.iloc[:,1:].values
+    activities = labels
 
     encoder = save_and_load_encoder(labels, csv_path)
     scaler = save_and_load_scalar(Inputs, csv_path)
@@ -28,7 +29,7 @@ def get_data(csv_path):
         labels = encoder.transform(labels.reshape(-1,1))
         labels = labels.toarray()
         Inputs, labels = shuffle(Inputs, labels)
-        return Inputs, labels
+        return Inputs, labels, activities
     else:
         Inputs = shuffle(Inputs)
         return Inputs
@@ -71,19 +72,28 @@ def configure_cnn_inputs(X):
     X = X.reshape(-1, input_shape[0], input_shape[1], input_shape[2])
     return X
 
-def plot_images(X):
-    image_idxs = np.random.choice(len(X), n_images)
-    Xplot = X[image_idxs]
-
+def plot_images_per_class(X, activities):
     if not os.path.exists('Dataset/images'):
         os.makedirs('Dataset/images')
 
+    Yunique = list(set(activities))
+    for label in Yunique:
+        Xlabel = X[activities==label]
+        if len(Xlabel) > image_per_class:
+            Xplot = Xlabel[np.random.choice(len(Xlabel), image_per_class, replace=False)]
+        else:
+            Xplot = Xlabel
+        plot_images(Xplot, label)
+
+def plot_images(Xplot, name):
     for i,I in enumerate(Xplot):
         I = (I * 255).astype(np.uint8)
-        cv.imwrite('Dataset/images/'+str(i)+'.png', I) 
+        cv.imwrite('Dataset/images/'+ name + '_' + str(i) +'.png', I) 
 
 def load_data():
-    X, Y = get_data(train_csv)
+    X, Y, activities = get_data(train_csv)
     X = configure_cnn_inputs(X)
-    plot_images(X)
+    plot_images_per_class(X, activities)
     return X, Y
+
+load_data()
