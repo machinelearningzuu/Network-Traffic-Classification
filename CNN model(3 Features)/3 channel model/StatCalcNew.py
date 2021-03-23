@@ -32,13 +32,11 @@ def prepare_values(in_file, out_file, total_files):
 
     data_values_new = np.zeros((input_size, n_channels))
     for i in range(n_channels):
-        data_i = data_values[:,i]
-        if len(data_i) >= input_size:
-            data_values_new[:,i] = data_i[:input_size]
-        else:
-            data_values_new[:,i] = np.array(data_i.tolist() + [0] * (input_size - len(data_i)))
-    
+        data_i = data_values[:,i].reshape(-1,1)
+        data_values = np.resize(data_i,(input_shape[0],input_shape[1]))
+        data_values_new[:,i] = data_values.reshape(-1,)
         assert len(data_values_new[:,i]) == input_size, "data vector should contain 784 components"
+
     data_values_new = data_values_new.reshape(-1,)
     return data_values_new
 

@@ -34,4 +34,5 @@ names = ['Train Confidence', 'Test Confidence']
 confidence_img = 'visualization/confidence_distribution.png'
 
 #Create main CSV
+image_per_class = 2
 inout_columns = ['frame.time_delta_displayed', 'frame.len', 'data.len']
