@@ -6,7 +6,7 @@ dense2 = 512
 dense3 = 256
 keep_prob = 0.5
 n_features = 48
-n_classes = 92
+n_classes = 93
 input_shape = (28,28,1)
 input_size = 784
 

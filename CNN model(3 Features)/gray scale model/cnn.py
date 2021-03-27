@@ -32,6 +32,7 @@ class TrafficClassifier(object):
         print("Label Shape : {}".format(self.Y.shape))
 
     def classifier(self):
+        n_classes = len(drop_enc.categories_[0])
         inputs = Input(shape=input_shape)
         x = Conv2D(256, (3,3), activation='relu')(inputs)
         x = MaxPool2D(pool_size=(2, 2), strides=(2,2))(x)
