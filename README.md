@@ -12,6 +12,11 @@ is to detect anomaly apps with unusual traffic patterns.
 
   - Supervised Deep Learning, Unsupervised Deep Learning
   - Statistical feature calculation
+
+# Models 
+  - 1D-CNN with Statistical features
+  - ANN with Statistical features
+  - 2D-CNN with Spatial features
  
 # Tools
 
