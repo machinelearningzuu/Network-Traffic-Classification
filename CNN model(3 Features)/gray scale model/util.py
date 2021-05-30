@@ -29,7 +29,7 @@ def get_data(csv_path):
         labels = encoder.transform(labels.reshape(-1,1))
         labels = labels.toarray()
         Inputs, labels = shuffle(Inputs, labels)
-        return Inputs, labels, activities
+        return Inputs, labels, activities, encoder
     else:
         Inputs = shuffle(Inputs)
         return Inputs
@@ -91,9 +91,9 @@ def plot_images(Xplot, name):
         cv.imwrite('Dataset/images/'+ name + '_' + str(i) +'.png', I) 
 
 def load_data():
-    X, Y, activities = get_data(train_csv)
+    X, Y, activities, encoder = get_data(train_csv)
     X = configure_cnn_inputs(X)
-    plot_images_per_class(X, activities)
-    return X, Y
+    # plot_images_per_class(X, activities)/
+    return X, Y, encoder
 
-load_data()
+# load_data()

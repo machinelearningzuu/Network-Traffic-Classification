@@ -25,9 +25,10 @@ from util import load_data
 
 class TrafficClassifier(object):
     def __init__(self):
-        X, Y = load_data()
+        X, Y, encoder = load_data()
         self.X = X 
         self.Y = Y
+        self.encoder = encoder
         print("Input Shape : {}".format(self.X.shape))
         print("Label Shape : {}".format(self.Y.shape))
 
@@ -96,12 +97,34 @@ class TrafficClassifier(object):
     def save_model(self):
         self.model.save(model_weights)
 
-    def evaluation(self, X):
-        Ypred = self.model.predict(X)
+
+    def evaluation(self):
+        Ypred = self.model.predict(self.X)
         Ppred = np.max(Ypred, axis=-1)
         unk = (Ppred <= custom_acc)
         Punk = np.mean(unk) * 100
-        return Punk
+        print("Unknown {} data Percentage : {}%".format(
+                                        "Train",
+                                        round(Punk,3))
+                                        )
+
+    def predict_classes(self):
+        Ypred = self.model.predict(self.X)
+
+        N = Ypred.shape[0]
+        Ppred = np.argmax(Ypred, axis=-1)
+        Ponehot = np.zeros((N, n_classes), dtype=np.int64)
+        for i in range(N):
+           j = Ppred[i]
+           Ponehot[i,j] = 1
+        Pclasses = self.encoder.inverse_transform(Ponehot).reshape(-1,)
+        class_count = dict(Counter(Pclasses.tolist()))
+        class_count = sorted(class_count.items(),key=operator.itemgetter(1),reverse=True)
+        for label, value in class_count:
+            fraction = (value/N)*100
+            fraction = round(fraction, 3)
+            print("{} : {}%".format(label,fraction))
+
 
     def run(self):
         if os.path.exists(model_weights):
@@ -112,6 +135,8 @@ class TrafficClassifier(object):
             self.classifier()
             self.train()
             self.save_model()
+        self.evaluation()
+        self.predict_classes()
 
 if __name__ == "__main__":
     model = TrafficClassifier()
