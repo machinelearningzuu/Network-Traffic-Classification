@@ -4,7 +4,6 @@ np.set_printoptions(threshold=sys.maxsize)
 
 import pandas as pd
 from matplotlib import pyplot as plt
-import seaborn as sns
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 import tensorflow as tf
@@ -159,32 +158,32 @@ class NetworkTrafficClassifier(object):
     def predicts(self,X):
         return self.model.predict(X)
 
-    def predict_app(self):
-        TrainDataDict, TestDataDict = app_data()
-        if Train:
-            for app, data in TrainDataDict.items():
-                print(FullAppNames[app])
-                Pclasses = self.app_prediction(data)
-                get_app_percentage(Pclasses)
-                print("\n")
-        else:
-            for app, data in TestDataDict.items():
-                print(FullAppNames[app])
-                Pclasses = self.app_prediction(data)
-                get_app_percentage(Pclasses)
-                print("\n")
+    # def predict_app(self):
+    #     TrainDataDict, TestDataDict = app_data()
+    #     if Train:
+    #         for app, data in TrainDataDict.items():
+    #             print(FullAppNames[app])
+    #             Pclasses = self.app_prediction(data)
+    #             get_app_percentage(Pclasses)
+    #             print("\n")
+    #     else:
+    #         for app, data in TestDataDict.items():
+    #             print(FullAppNames[app])
+    #             Pclasses = self.app_prediction(data)
+    #             get_app_percentage(Pclasses)
+    #             print("\n")
 
 
-    def app_prediction(self, data):
-        Ypred = self.model.predict(data)
-        N = Ypred.shape[0]
-        Ppred = np.argmax(Ypred, axis=-1)
-        Ponehot = np.zeros((N, train_classes), dtype=np.int64)
-        for i in range(N):
-           j = Ppred[i]
-           Ponehot[i,j] = 1
-        Pclasses = self.encoder.inverse_transform(Ponehot).reshape(-1,)
-        return Pclasses
+    # def app_prediction(self, data):
+    #     Ypred = self.model.predict(data)
+    #     N = Ypred.shape[0]
+    #     Ppred = np.argmax(Ypred, axis=-1)
+    #     Ponehot = np.zeros((N, train_classes), dtype=np.int64)
+    #     for i in range(N):
+    #        j = Ppred[i]
+    #        Ponehot[i,j] = 1
+    #     Pclasses = self.encoder.inverse_transform(Ponehot).reshape(-1,)
+    #     return Pclasses
 
     def run(self):
         if os.path.exists(model_weights):
@@ -195,10 +194,10 @@ class NetworkTrafficClassifier(object):
             self.classifier()
             self.train()
             # self.plot_metrics()
-        #     self.save_model(model_weights)
+            self.save_model(model_weights)
+        self.predict_classes()
         # self.evaluation()
         # self.predict_app()
-        # self.predict_classes()
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

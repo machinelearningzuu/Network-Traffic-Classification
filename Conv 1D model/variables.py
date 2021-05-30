@@ -15,7 +15,7 @@ train_classes = 63
 
 learning_rate = 0.0001
 batch_size = 64
-num_epoches = 500
+num_epoches = 10
 validation_split = 0.15
 
 custom_acc = 0.9
@@ -25,10 +25,8 @@ scalar_weights = os.path.join(os.getcwd(), 'Weights/scalar.pickle')
 encoder_weights = os.path.join(os.getcwd(), 'Weights/encoder.pickle')
 model_weights =  os.path.join(os.getcwd(), 'Weights/model.h5')
 
-train_csv = os.path.join(os.getcwd(), 'Datasets 0.5s/Train0.5s.csv')
-test_csv = os.path.join(os.getcwd(), 'Datasets 0.5s/Test0.5s.csv')
-# train_csv = os.path.join(os.getcwd(), '0.2 csv/Train0.2s.csv')
-# test_csv = os.path.join(os.getcwd(), '0.2 csv/Test0.2s.csv')
+train_csv = os.path.join(os.getcwd(), 'Dataset/Train.csv')
+test_csv = os.path.join(os.getcwd(), 'Dataset/Test.csv')
 
 #Data Visulization
 plot_step = 100
